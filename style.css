@@ -5,13 +5,15 @@ h1 {
   background-color: #8cffc3;
   color: #fff;
   text-align: center;
-  margin: 0 0;
+  margin: 0;
+  padding: 5rem, 0;
 }
 #useless-button {
   background-color: #0a0;
   color: #fff;
-  margin: 0 auto;
+  margin: 0, auto;
   width: 40%;
+  padding: 1rem, 0;
 }
 #useless-button:hover {
   background-color: #000;

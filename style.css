@@ -5,7 +5,9 @@
 }
 #useless-button {
   background-color: #0a0;
+  color: #fff;
   margin: 0 auto;
+  width: 60%;
 }
 #useless-button:hover {
   background-color: #000;

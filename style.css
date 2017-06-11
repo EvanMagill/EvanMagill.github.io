@@ -12,8 +12,9 @@ h1 {
   background-color: #0a0;
   color: #fff;
   margin: 0, auto;
-  width: 50%;
+  width: 40%;
   padding: 1rem, 1rem;
+  border-radius: 1rem;
 }
 #useless-button:hover {
   background-color: #000;

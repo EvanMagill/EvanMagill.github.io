@@ -1,5 +1,11 @@
+* {
+  font-family: "Arial", san-serif;
+}
 h1 {
-  font-size: 50px;
+  font-size: 10rem;
+}
+p {
+  font-size: 2rem;
 }
 #about {
   background-color: #7da;

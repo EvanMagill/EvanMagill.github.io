@@ -12,7 +12,8 @@ h1 {
   background-color: #0a0;
   color: #fff;
   margin: 0 auto;
-  width: 40%;
+  width: 30%;
+  height: auto;
   padding: 3rem 3rem;
   border-radius: 1rem;
 }

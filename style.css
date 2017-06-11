@@ -2,7 +2,7 @@ h1 {
   font-size: 5;
 }
 #about {
-  background-color: #8cffc3;
+  background-color: #7ea;
   color: #fff;
   text-align: center;
   margin: 0;
@@ -12,8 +12,8 @@ h1 {
   background-color: #0a0;
   color: #fff;
   margin: 0, auto;
-  width: 40%;
-  padding: 1rem, 0;
+  width: 50%;
+  padding: 1rem, 1rem;
 }
 #useless-button:hover {
   background-color: #000;

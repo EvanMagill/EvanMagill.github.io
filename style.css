@@ -26,3 +26,6 @@ p {
 #useless-button:hover {
   background-color: #000;
 }
+#footer {
+  background-color: #333;
+}

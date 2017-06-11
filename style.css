@@ -8,15 +8,12 @@ html, body {
 h1 {
   font-size: 4rem;
 }
-p {
-  font-size: 2rem;
-}
 #about {
   background-color: #7da;
   color: #fff;
   text-align: center;
   margin: 0;
-  padding: 5rem 0;
+  padding: 2rem 0 5rem 0;
 }
 #useless-button {
   background-color: #0a0;

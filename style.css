@@ -40,6 +40,9 @@ h1 {
 #useless-text {
   font-size: 1.2rem;
 }
+#fade-text {
+  color: #ffffff;
+}
 #footer-text {
   font-size: 1rem;
 }

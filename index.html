@@ -21,8 +21,13 @@
     <script>
       console.log("yes");
       alert("hello");
-      var fade = document.querySelector("#fade");
-      fade.style.color = "blue";
+      var fading = document.querySelector("#fade");
+      var fader = 0;
+      fade = function() {
+        fader ++;
+        fading.style.color = "#" + fader;
+      };
+      setInterval(fade, 10);
     </script>
   </body>
 </html>

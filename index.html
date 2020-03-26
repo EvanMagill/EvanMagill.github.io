@@ -6,45 +6,13 @@
     <link rel="icon" type="image/x-icon" href="/efavicon.ico">
   </head>
   <body>
-    <div id="about">
-      <h1>Welcome to my website</h1>
-      <p id="about-text">This website is full of puzzles, interactive tidbits, and games.</p>
-    </div>
-    <div id="useless-button">
-      <p id="useless-text">This button does absolutely nothing no matter how much you click it so <strong>don’t click it.</strong>
-        You are entirely responsible for any time wasted clicking this button.</p>
-    </div>
-    <div id="fade-text">
-      <div id="fade">
-        <p id="warning"><strong>Read this before it's too late!</strong></p>
-        <p>This information is important, nay vital, nay crucial.
-          I believe that if you let this information slip away you would be putting you and everyone you have ever known in great danger.
-          The world itself may come to an end if you don't read the entirety of this message.
-          In fact this information is the most imperative information in modern history,
-          nay human history, nay Earth's history, nay all of history.
-          This information is so perpetually pressing, so ponderously primary,
-          so principally paramount that it will forever change the universe.
-          This information that I am about to give to you is none other than this...
-          <br/>umm well this is embarassing. I've entirely forgotten the information.
-          This information that was so massively meaningful, so monumentally momentous, that mattered so much has slipped away.
-          Oh well, it probably wasn't very important.
-        </p>
-      </div>
-      <p>Clever, now then, here is your hint: easilyAggravatedButton <br/>Good Luck</p>
-    </div>
-    <div id="footer">
-      <p id="footer-text">Any problems or suggestions? Email me at magillep@gmail.com</p>
-    </div>
+    <header id="header">It's a header.</header>
     <script>
-      var fading = document.querySelector("#fade");
-      var fader = 0;
-      fade = function() {
-        fader ++;
-        fading.style.color = "rgb(" + fader + "," + fader + "," + fader + ")";
+      var header = document.querySelector("#header");
+      change = function() {
+        header.style.color = "rgb(" + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + ")";
       };
-      if(fader < 255) {
-        setInterval(fade, 100);
-      }
+      setInterval(fade, 100);
     </script>
   </body>
 </html>

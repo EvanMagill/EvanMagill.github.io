@@ -11,7 +11,14 @@
       var alwaysTrue = true;
       var header = document.querySelector("#header");
       change = function() {
-        header.style.backgroundColor = "rgb(" + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + ")";
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        header.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
+        var textR = 255 * (1 - Math.floor(r / 128));
+        var textG = 255 * (1 - Math.floor(g / 128));
+        var textB = 255 * (1 - Math.floor(b / 128));
+        header.style.color = "rgb(" + textR + ", "  + textG + ", " + textB + ")";
       };
       if(alwaysTrue) {
         setInterval(change, 500);

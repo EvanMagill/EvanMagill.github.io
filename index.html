@@ -12,7 +12,11 @@
       change = function() {
         header.style.color = "rgb(" + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + ")";
       };
-      setInterval(change, 100);
+      if(alwaysTrue) {
+        setInterval(change, 100);
+      }else {
+        clearInterval(change);
+      }
     </script>
   </body>
 </html>

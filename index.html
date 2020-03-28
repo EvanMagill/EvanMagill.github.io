@@ -32,7 +32,7 @@
             }
             text[j] = 255 * (1 - Math.floor(tB[0][j] / 128));
           }
-          body.style.color = "rgb(" + textR + ", "  + textG + ", " + textB + ")";
+          body.style.color = "rgb(" + text[0] + ", "  + text[1] + ", " + text[2] + ")";
         }else {
           for(var j = 0; j < 3; j ++) {
             tB[0][j] = Math.floor(Math.random() * 256);

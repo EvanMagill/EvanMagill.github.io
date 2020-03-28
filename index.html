@@ -30,6 +30,7 @@
       var display = [[128, 128, 128], [128, 128, 128]];
       change = function() {
         if(changeCount % 3 == 0) {
+          console.log("mod 3");
           for(var j = 0; j < 3; j ++) {
             for(var i = 0; i < 2; i ++) {
               tB[i][j] = Math.floor(Math.random() * 256);
@@ -38,6 +39,7 @@
           }
           header.style.color = "rgb(" + text[0] + ", "  + text[1] + ", " + text[2] + ")";
         }else {
+          console.log("normal");
           for(var j = 0; j < 3; j ++) {
             tB[1][j] = Math.floor(Math.random() * 256);
           }

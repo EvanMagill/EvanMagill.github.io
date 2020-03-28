@@ -21,13 +21,15 @@
       var header = document.querySelector("header");
       var style = document.querySelector("style");
       var tB = [[],[]];//top and bottom.
-      for(var i = 0; i < 2; i ++) {
-        for(var j = 0; j < 3; j ++) {
+      var text = [];
+      var display = [[],[]];
+      for(var j = 0; j < 3; j ++) {
+        for(var i = 0; i < 2; i ++) {
           tB[i][j] = Math.floor(Math.random() * 256);
+          display[i][j] = tB[i][j];
         }
+        text[j] = 255 * (1 - Math.floor(tB[0][j] / 128));
       }
-      var text = [255 * (1 - Math.floor(tB[0][0] / 128)), 255 * (1 - Math.floor(tB[0][1] / 128)), 255 * (1 - Math.floor(tB[0][2] / 128))];
-      var display = [[128, 128, 128], [128, 128, 128]];
       change = function() {
         if(changeCount % 3 == 0) {
           console.log("mod 3");

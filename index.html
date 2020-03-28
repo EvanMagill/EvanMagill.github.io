@@ -27,7 +27,7 @@
         }
       }
       var text = [255 * (1 - Math.floor(tB[0][0] / 128)), 255 * (1 - Math.floor(tB[0][1] / 128)), 255 * (1 - Math.floor(tB[0][2] / 128))];
-      var approach = [[128, 128, 128], [128, 128, 128]];
+      var display = [[128, 128, 128], [128, 128, 128]];
       change = function() {
         if(changeCount % 3 == 0) {
           for(var j = 0; j < 3; j ++) {
@@ -45,12 +45,12 @@
         changeCount ++;
       };
       approach = function() {
-        for(var i = 0; i < 0; i ++) {
-          for(var j = 0; j < 0; j ++) {
-            if(approach[i][j] < tB[i][j]) {
-              approach[i][j] ++;
-            }else if (approach[i][j] > tB[i][j]) {
-              approach[i][j] --;
+        for(var i = 0; i < 2; i ++) {
+          for(var j = 0; j < 3; j ++) {
+            if(display[i][j] < tB[i][j]) {
+              display[i][j] ++;
+            }else if (display[i][j] > tB[i][j]) {
+              display[i][j] --;
             }
           }
         }

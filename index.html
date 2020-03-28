@@ -33,7 +33,6 @@
       }
       change = function() {
         if(changeCount % 10 == 9) {
-          console.log("mod 3");
           for(var j = 0; j < 3; j ++) {
             for(var i = 0; i < 2; i ++) {
               tB[i][j] = Math.floor(Math.random() * 256);
@@ -42,15 +41,11 @@
           }
           header.style.color = "rgb(" + text[0] + ", "  + text[1] + ", " + text[2] + ")";
         }else {
-          console.log("normal");
           for(var j = 0; j < 3; j ++) {
             tB[1][j] = Math.floor(Math.random() * 256);
           }
         }
         changeCount ++;
-        console.log("changeCount: " + changeCount + ",  text: [" + text[0] + ", "  + text[1] + ", " + text[2] + "]");
-        console.log("top:    [" + tB[0][0] + ", "  + tB[0][1] + ", " + tB[0][2] + "]");
-        console.log("bottom: [" + tB[1][0] + ", "  + tB[1][1] + ", " + tB[1][2] + "]");
       };
       approach = function() {
         for(var i = 0; i < 2; i ++) {
@@ -63,8 +58,6 @@
           }
         }
         if(changeCount < 5) {
-          console.log("display top:    [" + display[0][0] + ", "  + display[0][1] + ", " + display[0][2] + "]");
-          console.log("display bottom: [" + display[1][0] + ", "  + display[1][1] + ", " + display[1][2] + "]");
         }
         style.innerHTML = "#header { background: linear-gradient(0deg, rgba(" + display[1][0] + ", " + display[1][1] + ", " + display[1][2] + ",1) 0%, rgba(" + display[0][0] + ", " + display[0][1] + ", " + display[0][2] + ",1) 100%); }";
       }

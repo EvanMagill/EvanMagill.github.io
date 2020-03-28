@@ -60,15 +60,15 @@
           }
         }
         if(changeCount < 5) {
-          //console.log("display top:    [" + display[0][0] + ", "  + display[0][1] + ", " + display[0][2] + "]");
-          //console.log("display bottom: [" + display[1][0] + ", "  + display[1][1] + ", " + display[1][2] + "]");
+          console.log("display top:    [" + display[0][0] + ", "  + display[0][1] + ", " + display[0][2] + "]");
+          console.log("display bottom: [" + display[1][0] + ", "  + display[1][1] + ", " + display[1][2] + "]");
         }
         style.innerHTML = "header { background: linear-gradient(0deg, rgba(display[0][0],display[0][1],display[0][2],1) 0%, rgba(display[1][0],display[1][1],display[1][2],1) 100%); }";
       }
       if(alwaysTrue) {
         change();
         setInterval(change, 20000);
-        setInterval(approach, 1);
+        setInterval(approach, 10);
       }else {
         clearInterval(change);
         clearInterval(approach);

@@ -3,27 +3,61 @@
   <head>
     <title>Evan Magill's website</title>
     <link rel="icon" type="image/x-icon" href="/efavicon.ico">
+    <style>
+    body {
+      background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    }
+    </style>
   </head>
   <body>
     <header id="header">It's a header.</header>
     <script>
+      var changeCount = 0;
       var alwaysTrue = true;
-      var body = document.querySelector("body");
+      var style = document.querySelector("style");
+      var tB = [[],[]];//top and bottom.
+      for(var i = 0; i < 2; i ++) {
+        for(var j = 0; j < 3; j ++) {
+          tB[i][j] = Math.floor(Math.random() * 256);
+        }
+      }
+      var text = [255 * (1 - Math.floor(tB[0][0] / 128)), 255 * (1 - Math.floor(tB[0][1] / 128)), 255 * (1 - Math.floor(tB[0][2] / 128))];
+      var approach = [[128, 128, 128], [128, 128, 128]];
       change = function() {
-        var r = Math.floor(Math.random() * 256);
-        var g = Math.floor(Math.random() * 256);
-        var b = Math.floor(Math.random() * 256);
-        body.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
-        var textR = 255 * (1 - Math.floor(r / 128));
-        var textG = 255 * (1 - Math.floor(g / 128));
-        var textB = 255 * (1 - Math.floor(b / 128));
-        body.style.color = "rgb(" + textR + ", "  + textG + ", " + textB + ")";
+        if(changeCount % 3 == 0) {
+          for(var j = 0; j < 3; j ++) {
+            for(var i = 0; i < 2; i ++) {
+              tB[i][j] = Math.floor(Math.random() * 256);
+            }
+            text[j] = 255 * (1 - Math.floor(tB[0][j] / 128));
+          }
+          body.style.color = "rgb(" + textR + ", "  + textG + ", " + textB + ")";
+        }else {
+          for(var j = 0; j < 3; j ++) {
+            tB[0][j] = Math.floor(Math.random() * 256);
+          }
+        }
+        changeCount ++;
       };
+      approach = function() {
+        for(var i = 0; i < 2; i ++) {
+          for(var j = 0; j < 3; j ++) {
+            if(approach[i][j] < tB[i][j]) {
+              approach[i][j] ++;
+            }else if (approach[i][j] > tB[i][j]) {
+              approach[i][j] --;
+            }
+          }
+        }
+        style.innerHTML = "body { background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%); }";
+      }
       if(alwaysTrue) {
         change();
         setInterval(change, 20000);
+        setInterval(approach, 10);
       }else {
         clearInterval(change);
+        clearInterval(approach);
       }
     </script>
   </body>

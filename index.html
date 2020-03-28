@@ -32,7 +32,7 @@
         text[j] = 255 * (1 - Math.floor(tB[0][j] / 128));
       }
       change = function() {
-        if(changeCount % 3 == 0) {
+        if(changeCount % 10 == 9) {
           console.log("mod 3");
           for(var j = 0; j < 3; j ++) {
             for(var i = 0; i < 2; i ++) {

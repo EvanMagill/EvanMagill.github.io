@@ -13,12 +13,12 @@
     </style>
   </head>
   <body>
-    <header id="header">It's a header.</header>
+    <div id="header"><h1>It's a header.</h1></div>
     <p>Not the header.</p>
     <script>
       var changeCount = 0;
       var alwaysTrue = true;
-      var header = document.querySelector("header");
+      var header = document.querySelector("#header");
       var style = document.querySelector("style");
       var tB = [[],[]];//top and bottom.
       var text = [];

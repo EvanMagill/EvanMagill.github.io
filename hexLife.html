@@ -48,7 +48,7 @@
 			}
 			console.log(hexGrid);
 			function nextStep() {
-				var prevGrid = hexGrid;
+				var prevGrid = hexGrid.slice();
 				for(var row = 0; row < prevGrid.length; row ++) {
 					for(var col = 0; col < prevGrid[row].length; col ++) {
 						if(prevGrid[row][col]) {

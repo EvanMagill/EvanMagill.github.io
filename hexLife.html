@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<canvas id="Canvas" width="1900" height="950"
+		style="border:1px solid #c3c3c3;">
+		The canvas is not supported. This may work in a different browser.
+		</canvas>
+
+		<script>
+			var canvas = document.getElementById("Canvas");
+			var hexGrid = [];
+			var hexSide = 10;
+			var hexWidth = 2*hexSide;
+			var hexHeight = Math.sqrt(3)*hexSide;
+			var w = Math.floor(4/3 * canvas.width/hexWidth);
+			var h = Math.floor(2 * canvas.height/hexHeight);
+			console.log("Canvas width: " + canvas.width);
+			console.log("Canvas height: " + canvas.height);
+			
+			console.log("hexWidth: " + hexWidth);
+			console.log("hexHeight: " + hexHeight);
+			console.log("w: " + w);
+			console.log("h: " + h);
+			
+			for(var y = 0; y < h; y ++) {
+				hexGrid.push([]);
+				for(var x = 0; x < w; x ++) {
+					if(x % 2 == y % 2) {
+						hexGrid[y].push({row: y, col: x, alive: 0, color: "#000"});//row and col are probably not needed
+					}else {
+						hexGrid[y].push(false);
+					}
+				}
+			}
+			var ctx = canvas.getContext("2d");
+			function hHex(x, y, color) {//horizontal hexagon
+				ctx.fillStyle = color;
+				ctx.beginPath();
+				ctx.moveTo(x - hexWidth/4, y - hexHeight/2);
+				ctx.lineTo(x + hexWidth/4, y - hexHeight/2);
+				ctx.lineTo(x + hexWidth/2, y);
+				ctx.lineTo(x + hexWidth/4, y + hexHeight/2);
+				ctx.lineTo(x - hexWidth/4, y + hexHeight/2);
+				ctx.lineTo(x - hexWidth/2, y);
+				ctx.closePath();
+				ctx.fill();
+				//ctx.fillRect(x, y, hexWidth, hexHeight);//ignore this completely when you make it into a hexagon
+			}
+			console.log(hexGrid);
+			function nextStep() {
+				var prevGrid = hexGrid;
+				for(var row = 0; row < prevGrid.length; row ++) {
+					for(var col = 0; col < prevGrid[row].length; col ++) {
+						if(prevGrid[row][col]) {
+							var aN = 0;//alive neighbors
+							if(row > 0) {
+								if(col > 0) {
+									aN += prevGrid[row - 1][col - 1].alive;
+								}
+								if(col + 1 < prevGrid[row - 1].length) {
+									aN += prevGrid[row - 1][col + 1].alive;
+									
+								}
+								if(row - 2 >= 0) {
+									aN += prevGrid[row - 2][col].alive;
+								}
+							}
+							if(row + 1 < prevGrid.length) {
+								if(col > 0) {
+									aN += prevGrid[row + 1][col - 1].alive;
+								}
+								if(col + 1 < prevGrid[row + 1].length) {
+									aN += prevGrid[row + 1][col + 1].alive;
+								}
+								if(row + 2 < prevGrid.length) {
+									aN += prevGrid[row + 2][col].alive;
+								}
+							}
+							if(aN == 6) {
+								hexGrid[row][col].alive ++;
+								hexGrid[row][col].color = "#f" + hexGrid[row][col].alive % 10 + hexGrid[row][col].alive % 7;
+							}else if(prevGrid[row][col].alive == 1 && aN != 2 && aN != 3 && aN != 4) {
+								hexGrid[row][col].alive = 0;
+								hexGrid[row][col].color = "#000";
+							}else if(prevGrid[row][col].alive == 0 && aN == 3) {
+								hexGrid[row][col].alive = 1;
+								hexGrid[row][col].color = "#fff";
+							}
+						}
+					}
+				}
+				updateCanvas();
+			}
+			function updateCanvas() {
+				for(var row = 0; row < hexGrid.length; row ++) {
+					for(var col = 0; col < hexGrid[row].length; col ++) {
+						if(hexGrid[row][col]) {
+							hHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col].color);
+						}
+					}
+				}
+			}
+			function startTest() {
+				for(var i = 0; i < 2000; i ++) {
+					var row = Math.floor(Math.random() * h);
+					var col = Math.floor(Math.random() * w);
+					while(!hexGrid[row][col]) {
+						row = Math.floor(Math.random() * h);
+						col = Math.floor(Math.random() * w);
+					}
+					hexGrid[row][col].alive = 1;
+					hexGrid[row][col].color = "#fff";
+				}
+				updateCanvas();
+			}
+			startTest();
+			var pace = setInterval(nextStep, 200);
+		</script>
+	</body>
+</html>

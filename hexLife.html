@@ -1,17 +1,88 @@
 <!DOCTYPE html>
 <html>
 	<body>
-		<canvas id="Canvas" width="1900" height="950"
-		style="border:1px solid #c3c3c3;">
+		<canvas id="Canvas"
+		style="border:none;">
 		The canvas is not supported. This may work in a different browser.
 		</canvas>
-
+		<table>
+			<tr>
+				<th># of neighbors for a cell to survive | </th>
+				<th># of neighbors for a dead cell to become alive | </th>
+				<th># of neighbors for a cell to overachieve | </th>
+				<th>Hexagon side length (refresh to see change)</th>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive0">0</td>
+				<td><input type="checkbox" id="revive0">0</td>
+				<td><input type="checkbox" id="beyond0">0</td>
+				<td><center><input type="text" id="sideSize" value="10"> pixels</center></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive1">1</td>
+				<td><input type="checkbox" id="revive1">1</td>
+				<td><input type="checkbox" id="beyond1">1</td>
+			</tr>
+			<tr>
+			<tr>
+				<td><input type="checkbox" id="survive2">2</td>
+				<td><input type="checkbox" id="revive2">2</td>
+				<td><input type="checkbox" id="beyond2">2</td>
+				<th>Speed</th>
+			</tr>
+			<tr>
+			<tr>
+				<td><input type="checkbox" id="survive3">3</td>
+				<td><input type="checkbox" id="revive3">3</td>
+				<td><input type="checkbox" id="beyond3">3</td>
+				<td><center><input type="range" min="1" max="400" value="50" class="slider" id="speedSlider"></center></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive4">4</td>
+				<td><input type="checkbox" id="revive4">4</td>
+				<td><input type="checkbox" id="beyond4">4</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive5">5</td>
+				<td><input type="checkbox" id="revive5">5</td>
+				<td><input type="checkbox" id="beyond5">5</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive6">6</td>
+				<td><input type="checkbox" id="revive6">6</td>
+				<td><input type="checkbox" id="beyond6">6</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" id="survive7">>6</td>
+				<td><input type="checkbox" id="revive7">>6</td>
+				<td><input type="checkbox" id="beyond7">>6</td>
+			</tr>
+		</table>
+		<style>
+			body{
+				margin: 0;
+			}
+		</style>
 		<script>
 			var canvas = document.getElementById("Canvas");
+			var ctx = canvas.getContext("2d");
+			ctx.canvas.width = window.innerWidth - 17;
+			ctx.canvas.height = window.innerHeight;
+			var types = ["survive", "revive", "beyond"];
+			var checkboxes = [];
+			for(var type = 0; type < 3; type ++) {
+				checkboxes.push([]);
+				for(var num = 0; num < 8; num ++) {
+					checkboxes[type].push(document.getElementById(types[type] + num));
+				}
+			}
+			var sideField = document.getElementById("sideSize");
+			var speedSlider = document.getElementById("speedSlider");
 			var hexGrid = [];
-			var hexSide = 10;
+			var hexSide = sideField.value;
 			var hexWidth = 2*hexSide;
 			var hexHeight = Math.sqrt(3)*hexSide;
+			var frameWait = 2000/Math.sqrt(speedSlider.value);
 			var w = Math.floor(4/3 * canvas.width/hexWidth);
 			var h = Math.floor(2 * canvas.height/hexHeight);
 			console.log("Canvas width: " + canvas.width);
@@ -22,17 +93,21 @@
 			console.log("w: " + w);
 			console.log("h: " + h);
 			
+			function rescale() {
+				
+			}
+			
 			for(var y = 0; y < h; y ++) {
 				hexGrid.push([]);
 				for(var x = 0; x < w; x ++) {
 					if(x % 2 == y % 2) {
-						hexGrid[y].push({row: y, col: x, alive: 0, color: "#000"});//row and col are probably not needed
+						hexGrid[y].push(1);//row and col are probably not needed
 					}else {
 						hexGrid[y].push(false);
 					}
 				}
 			}
-			var ctx = canvas.getContext("2d");
+			
 			function hHex(x, y, color) {//horizontal hexagon
 				ctx.fillStyle = color;
 				ctx.beginPath();
@@ -44,77 +119,136 @@
 				ctx.lineTo(x - hexWidth/2, y);
 				ctx.closePath();
 				ctx.fill();
-				//ctx.fillRect(x, y, hexWidth, hexHeight);//ignore this completely when you make it into a hexagon
 			}
+			
+			function colorHex(x, y, state) {
+				var color = "";
+				switch(state) {
+					case 1:
+						color = "#000";
+						break;
+					case 2:
+						color = "#fff";
+						break;
+					default:
+						color += "#" + (state%16).toString(16) + (state%16).toString(16);
+						var mid = (state%256).toString(16);
+						if(mid.length < 2) {
+							color += "0" + mid;
+						}else {
+							color += mid;
+						}
+						var fin = Math.floor(40*Math.pow(state, 1/3)).toString(16);
+						color += fin[0] + fin[1];
+				}
+				hHex(x, y, color);
+			}
+			
 			console.log(hexGrid);
+			
+			
+			function ruleEval(status, neighbors) {
+				if(neighbors > 6) {
+					neighbors = 7;
+				}
+				if(checkboxes[2][neighbors].checked) {
+					return "ascend";
+				}else if(status == 2 && !checkboxes[0][neighbors].checked) {
+					return "die";
+				}else if(status == 1 && checkboxes[1][neighbors].checked) {
+					return "revive";
+				}else {
+					return "nothing";
+				}
+			}
+			
 			function nextStep() {
-				var prevGrid = hexGrid.slice();
+				var prevGrid = [];
+				for(var i = 0; i < hexGrid.length; i ++) {
+					prevGrid.push(hexGrid[i].slice());
+				}
 				for(var row = 0; row < prevGrid.length; row ++) {
 					for(var col = 0; col < prevGrid[row].length; col ++) {
 						if(prevGrid[row][col]) {
 							var aN = 0;//alive neighbors
 							if(row > 0) {
 								if(col > 0) {
-									aN += prevGrid[row - 1][col - 1].alive;
+									aN += prevGrid[row - 1][col - 1] - 1;
 								}
 								if(col + 1 < prevGrid[row - 1].length) {
-									aN += prevGrid[row - 1][col + 1].alive;
+									aN += prevGrid[row - 1][col + 1] - 1;
 									
 								}
 								if(row - 2 >= 0) {
-									aN += prevGrid[row - 2][col].alive;
+									aN += prevGrid[row - 2][col] - 1;
 								}
 							}
 							if(row + 1 < prevGrid.length) {
 								if(col > 0) {
-									aN += prevGrid[row + 1][col - 1].alive;
+									aN += prevGrid[row + 1][col - 1] - 1;
 								}
 								if(col + 1 < prevGrid[row + 1].length) {
-									aN += prevGrid[row + 1][col + 1].alive;
+									aN += prevGrid[row + 1][col + 1] - 1;
 								}
 								if(row + 2 < prevGrid.length) {
-									aN += prevGrid[row + 2][col].alive;
+									aN += prevGrid[row + 2][col] - 1;
 								}
 							}
-							if(aN == 6) {
-								hexGrid[row][col].alive ++;
-								hexGrid[row][col].color = "#f" + hexGrid[row][col].alive % 10 + hexGrid[row][col].alive % 7;
-							}else if(prevGrid[row][col].alive == 1 && aN != 2 && aN != 3 && aN != 4) {
-								hexGrid[row][col].alive = 0;
-								hexGrid[row][col].color = "#000";
-							}else if(prevGrid[row][col].alive == 0 && aN == 3) {
-								hexGrid[row][col].alive = 1;
-								hexGrid[row][col].color = "#fff";
+							switch(ruleEval(prevGrid[row][col], aN)) {
+								case "die":
+									hexGrid[row][col] = 1;
+								break;
+								case "revive":
+									hexGrid[row][col] = 2;
+								break;
+								case "ascend":
+									hexGrid[row][col] ++;
+								default:
 							}
+							colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
 						}
 					}
 				}
-				updateCanvas();
+				frameWait = 2000/Math.sqrt(speedSlider.value)
+				setTimeout(nextStep, frameWait);
+				//console.log(compareArrays(hexGrid, prevGrid));
+				//updateCanvas();
+			}
+			function compareArrays(arr1, arr2) {//only for 2D arrays of the same size
+				for(var i = 0; i < arr1.length; i ++) {
+					for(var j = 0; j < arr1[i].length; j ++) {
+						if(arr1[i][j] != arr2[i][j]) {
+							return "different";
+						}
+					}
+				}
+				return "identical";
 			}
 			function updateCanvas() {
+				ctx.fillStyle = "#000";
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
 						if(hexGrid[row][col]) {
-							hHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col].color);
+							hHex(col * hexWidth * 0.75, row * hexHeight/2, "#" + (""+(hexGrid[row][col]-1) * 9).repeat(3));
 						}
 					}
 				}
 			}
 			function startTest() {
-				for(var i = 0; i < 2000; i ++) {
+				for(var i = 0; i < 1; i ++) {
 					var row = Math.floor(Math.random() * h);
 					var col = Math.floor(Math.random() * w);
 					while(!hexGrid[row][col]) {
 						row = Math.floor(Math.random() * h);
 						col = Math.floor(Math.random() * w);
 					}
-					hexGrid[row][col].alive = 1;
-					hexGrid[row][col].color = "#fff";
+					hexGrid[row][col] = 2;
 				}
 				updateCanvas();
 			}
 			startTest();
-			var pace = setInterval(nextStep, 200);
+			setTimeout(nextStep, frameWait);
 		</script>
 	</body>
 </html>

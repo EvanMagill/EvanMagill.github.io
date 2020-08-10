@@ -35,7 +35,7 @@
 				<td><input type="checkbox" id="survive3">3</td>
 				<td><input type="checkbox" id="revive3">3</td>
 				<td><input type="checkbox" id="beyond3">3</td>
-				<td><center><input type="range" min="1" max="400" value="50" class="slider" id="speedSlider"></center></td>
+				<td><input type="button"  id="pausePlayButton" value="Pause" onclick="pausePlay()"> <center><input type="range" min="1" max="4000" value="50" class="slider" id="speedSlider"></center></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive4">4</td>
@@ -66,17 +66,23 @@
 		<script>
 			var canvas = document.getElementById("Canvas");
 			var ctx = canvas.getContext("2d");
+			var myTimeout;
 			ctx.canvas.width = window.innerWidth - 17;
 			ctx.canvas.height = window.innerHeight;
 			var types = ["survive", "revive", "beyond"];
 			var checkboxes = [];
+			var checkboxStates = [];//Holds boolean values of .checked for checkbox elements. Hopefully more efficient to deal with and prevents mid-state calculation changes.
 			for(var type = 0; type < 3; type ++) {
 				checkboxes.push([]);
+				checkboxStates.push([]);
 				for(var num = 0; num < 8; num ++) {
 					checkboxes[type].push(document.getElementById(types[type] + num));
+					checkboxStates[type].push(checkboxes[type][num].checked);
 				}
 			}
 			var sideField = document.getElementById("sideSize");
+			var pausePlayButton = document.getElementById("pausePlayButton");
+			var paused = false;
 			var speedSlider = document.getElementById("speedSlider");
 			var hexGrid = [];
 			var hexSide = sideField.value;
@@ -93,8 +99,17 @@
 			console.log("w: " + w);
 			console.log("h: " + h);
 			
-			function rescale() {
-				
+			function pausePlay() {
+				if(pausePlayButton.value == "Pause") {
+					pausePlayButton.value = "Play";
+					paused = true;
+					clearTimeout(myTimeout);
+				}else {
+					pausePlayButton.value = "Pause";
+					paused = false;
+					updateCanvas();
+					nextStep();
+				}
 			}
 			
 			for(var y = 0; y < h; y ++) {
@@ -151,11 +166,11 @@
 				if(neighbors > 6) {
 					neighbors = 7;
 				}
-				if(checkboxes[2][neighbors].checked) {
+				if(checkboxStates[2][neighbors]) {
 					return "ascend";
-				}else if(status == 2 && !checkboxes[0][neighbors].checked) {
+				}else if(status == 2 && !checkboxStates[0][neighbors]) {
 					return "die";
-				}else if(status == 1 && checkboxes[1][neighbors].checked) {
+				}else if(status == 1 && checkboxStates[1][neighbors]) {
 					return "revive";
 				}else {
 					return "nothing";
@@ -166,6 +181,11 @@
 				var prevGrid = [];
 				for(var i = 0; i < hexGrid.length; i ++) {
 					prevGrid.push(hexGrid[i].slice());
+				}
+				for(var type = 0; type < 3; type ++) {
+					for(var num = 0; num < 8; num ++) {
+						checkboxStates[type][num] = checkboxes[type][num].checked;
+					}
 				}
 				for(var row = 0; row < prevGrid.length; row ++) {
 					for(var col = 0; col < prevGrid[row].length; col ++) {
@@ -209,10 +229,10 @@
 						}
 					}
 				}
-				frameWait = 2000/Math.sqrt(speedSlider.value)
-				setTimeout(nextStep, frameWait);
-				//console.log(compareArrays(hexGrid, prevGrid));
-				//updateCanvas();
+				frameWait = 2000/Math.sqrt(speedSlider.value);
+				if(!paused) {
+					myTimeout = setTimeout(nextStep, frameWait);
+				}
 			}
 			function compareArrays(arr1, arr2) {//only for 2D arrays of the same size
 				for(var i = 0; i < arr1.length; i ++) {
@@ -248,7 +268,7 @@
 				updateCanvas();
 			}
 			startTest();
-			setTimeout(nextStep, frameWait);
+			myTimeout = setTimeout(nextStep, frameWait);
 		</script>
 	</body>
 </html>

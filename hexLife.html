@@ -46,11 +46,13 @@
 				<td><input type="checkbox" id="survive5">5</td>
 				<td><input type="checkbox" id="revive5">5</td>
 				<td><input type="checkbox" id="beyond5">5</td>
+				<td><input type="button"  value="Clear" onclick="clearGrid()"></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive6">6</td>
 				<td><input type="checkbox" id="revive6">6</td>
 				<td><input type="checkbox" id="beyond6">6</td>
+				<td><input type="button"  value="Add random living cells" onclick="randomAdd()"> Intensity: <input type="text" id="intensity" value="2000"></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive7">>6</td>
@@ -84,10 +86,12 @@
 			var pausePlayButton = document.getElementById("pausePlayButton");
 			var paused = false;
 			var speedSlider = document.getElementById("speedSlider");
+			var randomAddIntesity = document.getElementById("intensity");
 			var hexGrid = [];
 			var hexSide = sideField.value;
 			var hexWidth = 2*hexSide;
 			var hexHeight = Math.sqrt(3)*hexSide;
+			var fullUpdate = false;
 			var frameWait = 2000/Math.sqrt(speedSlider.value);
 			var w = Math.floor(4/3 * canvas.width/hexWidth);
 			var h = Math.floor(2 * canvas.height/hexHeight);
@@ -225,11 +229,16 @@
 									hexGrid[row][col] ++;
 								default:
 							}
-							colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
+							if(!fullUpdate) {
+								colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
+							}
 						}
 					}
 				}
 				frameWait = 2000/Math.sqrt(speedSlider.value);
+				if(fullUpdate) {
+					updateCanvas();
+				}
 				if(!paused) {
 					myTimeout = setTimeout(nextStep, frameWait);
 				}
@@ -250,13 +259,25 @@
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
 						if(hexGrid[row][col]) {
-							hHex(col * hexWidth * 0.75, row * hexHeight/2, "#" + (""+(hexGrid[row][col]-1) * 9).repeat(3));
+							colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
 						}
 					}
 				}
 			}
-			function startTest() {
-				for(var i = 0; i < 1; i ++) {
+			
+			function clearGrid() {
+				for(var row = 0; row < hexGrid.length; row ++) {
+					for(var col = 0; col < hexGrid[row].length; col ++) {
+						if(hexGrid[row][col]) {
+							hexGrid[row][col] = 1;
+						}
+					}
+				}
+				updateCanvas();
+			}
+			
+			function randomAdd() {
+				for(var i = 0; i < randomAddIntesity.value; i ++) {
 					var row = Math.floor(Math.random() * h);
 					var col = Math.floor(Math.random() * w);
 					while(!hexGrid[row][col]) {
@@ -267,7 +288,7 @@
 				}
 				updateCanvas();
 			}
-			startTest();
+			randomAdd();
 			myTimeout = setTimeout(nextStep, frameWait);
 		</script>
 	</body>

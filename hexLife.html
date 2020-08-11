@@ -10,13 +10,13 @@
 				<th># of neighbors for a cell to survive | </th>
 				<th># of neighbors for a dead cell to become alive | </th>
 				<th># of neighbors for a cell to overachieve | </th>
-				<th>Hexagon side length (refresh to see change)</th>
+				<th>Hexagon side length (Re-scaling will clear the board)</th>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive0">0</td>
 				<td><input type="checkbox" id="revive0">0</td>
 				<td><input type="checkbox" id="beyond0">0</td>
-				<td><center><input type="text" id="sideSize" value="10"> pixels</center></td>
+				<td><center><input type="text" id="sideSize" value="10"> pixels <input type="button"  value="Re-scale" onclick="rescale()"></center></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive1">1</td>
@@ -35,7 +35,7 @@
 				<td><input type="checkbox" id="survive3">3</td>
 				<td><input type="checkbox" id="revive3">3</td>
 				<td><input type="checkbox" id="beyond3">3</td>
-				<td><input type="button"  id="pausePlayButton" value="Pause" onclick="pausePlay()"> <center><input type="range" min="1" max="4000" value="50" class="slider" id="speedSlider"></center></td>
+				<td><input type="button"  value="Step" onclick="nextStep()"><input type="button"  id="pausePlayButton" value="Pause" onclick="pausePlay()"> <center><input type="range" min="1" max="4000" value="50" class="slider" id="speedSlider"></center></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive4">4</td>
@@ -103,6 +103,28 @@
 			console.log("w: " + w);
 			console.log("h: " + h);
 			
+			function rescale() {
+				ctx.canvas.width = window.innerWidth - 17;
+				ctx.canvas.height = window.innerHeight;
+				hexGrid = [];
+				hexSide = sideField.value;
+				hexWidth = 2*hexSide;
+				hexHeight = Math.sqrt(3)*hexSide;
+				w = Math.floor(4/3 * canvas.width/hexWidth);
+				h = Math.floor(2 * canvas.height/hexHeight);
+				for(var y = 0; y < h; y ++) {
+					hexGrid.push([]);
+					for(var x = 0; x < w; x ++) {
+						if(x % 2 == y % 2) {
+							hexGrid[y].push(1);
+						}else {
+							hexGrid[y].push(false);
+						}
+					}
+				}
+				updateCanvas();
+			}
+			
 			function pausePlay() {
 				if(pausePlayButton.value == "Pause") {
 					pausePlayButton.value = "Play";
@@ -120,7 +142,7 @@
 				hexGrid.push([]);
 				for(var x = 0; x < w; x ++) {
 					if(x % 2 == y % 2) {
-						hexGrid[y].push(1);//row and col are probably not needed
+						hexGrid[y].push(1);
 					}else {
 						hexGrid[y].push(false);
 					}
@@ -181,6 +203,10 @@
 				}
 			}
 			
+			function placeHex(row, col) {
+				colorHex(col * hexWidth * 0.75 + hexWidth/2, row * hexHeight/2 + hexHeight/2, hexGrid[row][col]);
+			}
+			
 			function nextStep() {
 				var prevGrid = [];
 				for(var i = 0; i < hexGrid.length; i ++) {
@@ -230,7 +256,7 @@
 								default:
 							}
 							if(!fullUpdate) {
-								colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
+								placeHex(row, col);
 							}
 						}
 					}
@@ -259,7 +285,7 @@
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
 						if(hexGrid[row][col]) {
-							colorHex(col * hexWidth * 0.75, row * hexHeight/2, hexGrid[row][col]);
+							placeHex(row, col);
 						}
 					}
 				}

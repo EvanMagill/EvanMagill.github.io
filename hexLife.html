@@ -28,14 +28,14 @@
 				<td><input type="checkbox" id="survive2">2</td>
 				<td><input type="checkbox" id="revive2">2</td>
 				<td><input type="checkbox" id="beyond2">2</td>
-				<th>Speed</th>
+				<td><input type="button"  value="Step" onclick="nextStep()"><input type="button"  id="pausePlayButton" value="Pause" onclick="pausePlay()"> Turn: <span id="turnCounter">0</span></td>
 			</tr>
 			<tr>
 			<tr>
 				<td><input type="checkbox" id="survive3">3</td>
 				<td><input type="checkbox" id="revive3">3</td>
 				<td><input type="checkbox" id="beyond3">3</td>
-				<td><input type="button"  value="Step" onclick="nextStep()"><input type="button"  id="pausePlayButton" value="Pause" onclick="pausePlay()"> <center><input type="range" min="1" max="4000" value="50" class="slider" id="speedSlider"></center></td>
+				<td>Speed: <input type="range" min="1" max="4000" value="50" class="slider" id="speedSlider"></td>
 			</tr>
 			<tr>
 				<td><input type="checkbox" id="survive4">4</td>
@@ -85,6 +85,8 @@
 			var sideField = document.getElementById("sideSize");
 			var pausePlayButton = document.getElementById("pausePlayButton");
 			var paused = false;
+			var turn = 0;
+			var turnCounter = document.getElementById("turnCounter");
 			var speedSlider = document.getElementById("speedSlider");
 			var randomAddIntesity = document.getElementById("intensity");
 			var hexGrid = [];
@@ -106,6 +108,8 @@
 			console.log("h: " + h);
 			
 			function rescale() {
+				turn = 0;
+				turnCounter.innerHTML = turn;
 				ctx.canvas.width = window.innerWidth - 17;
 				ctx.canvas.height = window.innerHeight;
 				hexGrid = [];
@@ -270,7 +274,10 @@
 				if(!paused) {
 					myTimeout = setTimeout(nextStep, frameWait);
 				}
+				turn ++;
+				turnCounter.innerHTML = turn;
 			}
+			
 			function compareArrays(arr1, arr2) {//only for 2D arrays of the same size
 				for(var i = 0; i < arr1.length; i ++) {
 					for(var j = 0; j < arr1[i].length; j ++) {
@@ -294,6 +301,8 @@
 			}
 			
 			function clearGrid() {
+				turn = 0;
+				turnCounter.innerHTML = turn;
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
 						if(hexGrid[row][col]) {
@@ -374,11 +383,9 @@
 			
 			canvas.addEventListener("mousedown", function(e) {
 				mouseHandler(e, "mousedown");
-				console.log("mousedown");
 			});
 			canvas.addEventListener("mouseup", function(e) {
 				mouseHandler(e, "mouseup");
-				console.log("mouseup");
 			});
 			canvas.addEventListener("mousemove", function(e) {
 				mouseHandler(e, "mousemove");

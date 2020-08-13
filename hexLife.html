@@ -93,6 +93,7 @@
 			var hexHeight = Math.sqrt(3)*hexSide;
 			var xPosRef = 3/4 * hexWidth;
 			var yPosRef = hexHeight/2;
+			var lastClicked = {held: false, row: 0, col: 0};
 			var fullUpdate = false;
 			var frameWait = 2000/Math.sqrt(speedSlider.value);
 			var w = Math.floor(4/3 * canvas.width/hexWidth);
@@ -341,24 +342,45 @@
 					console.log("Oh no, you've clicked in a weird spot");
 				}
 				console.log(hexGrid[trueRow][trueCol]);
-				if(hexGrid[trueRow][trueCol] == 1) {
-					hexGrid[trueRow][trueCol] = 2;
-				}else {
-					hexGrid[trueRow][trueCol] = 1;
+				if(!lastClicked.held || lastClicked.row != trueRow || lastClicked.col != trueCol) {
+					lastClicked.row = trueRow;
+					lastClicked.col = trueCol;
+					if(hexGrid[trueRow][trueCol] == 1) {
+						hexGrid[trueRow][trueCol] = 2;
+					}else {
+						hexGrid[trueRow][trueCol] = 1;
+					}
+					updateCanvas();
 				}
-				updateCanvas();
 			}
 			
-			function getCursorPosition(canvas, event) {
-				const rect = canvas.getBoundingClientRect()
-				const x = event.clientX - rect.left
-				const y = event.clientY - rect.top
-				console.log("x: " + x + " y: " + y)
-				coordToHex(x, y);
+			function getCursorPosition(event) {
+				const rect = canvas.getBoundingClientRect();
+				return {x: event.clientX - rect.left, y: event.clientY - rect.top};
 			}
 			
-			canvas.addEventListener('mousedown', function(e) {
-				getCursorPosition(canvas, e);
+			function mouseHandler(event, interactionType) {
+				if(interactionType == "mouseup") {
+					lastClicked.held = false;
+				}else {
+					if(interactionType == "mousedown") {
+						lastClicked.held = true;
+					}
+					if(lastClicked.held) {
+						var mousePos = getCursorPosition(event);
+						coordToHex(mousePos.x, mousePos.y);
+					}
+				}
+			}
+			
+			canvas.addEventListener("mousedown", function(e) {
+				mouseHandler(e, "mousedown");
+			});
+			canvas.addEventListener("mouseup", function(e) {
+				mouseHandler(e, "mouseup");
+			});
+			canvas.addEventListener("mousemove", function(e) {
+				mouseHandler(e, "mousemove");
 			});
 			
 			randomAdd();

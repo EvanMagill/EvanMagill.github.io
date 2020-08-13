@@ -95,7 +95,7 @@
 			var hexHeight = Math.sqrt(3)*hexSide;
 			var xPosRef = 3/4 * hexWidth;
 			var yPosRef = hexHeight/2;
-			var lastClicked = {held: false, row: 0, col: 0};
+			var lastClicked = {held: false, row: -1, col: -1};
 			var fullUpdate = false;
 			var frameWait = 2000/Math.sqrt(speedSlider.value);
 			var w = Math.floor(4/3 * canvas.width/hexWidth);
@@ -116,6 +116,9 @@
 				hexSide = Number(sideField.value);
 				hexWidth = 2*hexSide;
 				hexHeight = Math.sqrt(3)*hexSide;
+				xPosRef = 3/4 * hexWidth;
+				yPosRef = hexHeight/2;
+				lastClicked = {held: false, row: -1, col: -1};
 				w = Math.floor(4/3 * canvas.width/hexWidth);
 				h = Math.floor(2 * canvas.height/hexHeight);
 				for(var y = 0; y < h; y ++) {
@@ -333,6 +336,7 @@
 				var checkY = y - rowAprox * yPosRef;
 				var trueCol = colAprox;
 				var trueRow = rowAprox;
+				console.log(".\nrowAprox: " + rowAprox + "\ncolAprox: " + colAprox + "\n.");
 				if(hexGrid[rowAprox][colAprox]) {
 					var really = 2 * checkX + hexSide;
 					if(checkY < -2*checkX + hexSide) {

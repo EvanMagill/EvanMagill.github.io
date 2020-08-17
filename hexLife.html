@@ -338,16 +338,18 @@
 				var trueRow = rowAprox;
 				console.log(".\nrowAprox: " + rowAprox + "\ncolAprox: " + colAprox + "\n.");
 				if(hexGrid[rowAprox][colAprox]) {
-					var really = 2 * checkX + hexSide;
-					if(checkY < -2*checkX + hexSide) {
+					if(checkY < -Math.sqrt(3)*checkX + hexSide) {
+						console.log(checkY + " < " + (-Math.sqrt(3)*checkX + hexSide));
 						trueRow --;
 						trueCol --;
+					}else {
+						console.log(checkY + " >= " + (-Math.sqrt(3)*checkX + hexSide));
 					}
 				}else if(hexGrid[rowAprox - 1][colAprox]){
 					rowAprox --;
 					trueRow = rowAprox;
 					checkY = y - rowAprox * yPosRef;
-					if(checkY > 2*checkX + hexSide) {
+					if(checkY > Math.sqrt(3)*checkX + hexSide) {
 						trueRow ++;
 						trueCol --;
 					}
@@ -357,12 +359,14 @@
 				if(lastClicked.row != trueRow || lastClicked.col != trueCol) {
 					lastClicked.row = trueRow;
 					lastClicked.col = trueCol;
-					if(hexGrid[trueRow][trueCol] == 1) {
-						hexGrid[trueRow][trueCol] = 2;
-					}else {
-						hexGrid[trueRow][trueCol] = 1;
+					if(hexGrid[trueRow][trueCol]) {
+						if(hexGrid[trueRow][trueCol] == 1) {
+							hexGrid[trueRow][trueCol] = 2;
+						}else {
+							hexGrid[trueRow][trueCol] = 1;
+						}
+						placeHex(trueRow, trueCol);
 					}
-					placeHex(trueRow, trueCol);
 				}
 			}
 			

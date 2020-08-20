@@ -7,15 +7,25 @@
   <body>
     <script type="text/javascript">
       var result = 0;
-      console.log(1.2%1);
-      /*function randomInt(min, max) {
-        return Math.floor(Math.random * Math.floor)
+      var peakTotal = 0;
+      var numPeaks = 0;
+      function randomInt(min, max) {//Min and max inclusive. Thanks MDN!
+        return Math.floor(Math.random() * (max - min + 1) + min);
       }
-      function increMod(n, min, max) {
-        for(var i = 0; i < n; i ++) {
-          result = (result + 1) %
+      function increMod(runs, min, max) {
+        for(var i = 0; i < runs; i ++) {
+          var newResult = (result + 1) % randomInt(min, max);
+          if(newResult < result) {
+            console.log("Peak: " + result);
+            peakTotal += result;
+            numPeaks ++;
+          }
+          result = newResult;
+          console.log(result);
         }
-      }*/
+        console.log("Current average peak: " + (peakTotal/numPeaks));
+      }
+      var computeTiming = setInterval(increMod, 100, 100)
     </script>
   </body>
 </html>

@@ -129,9 +129,9 @@
 					hexGrid.push([]);
 					for(var x = 0; x < w; x ++) {
 						if(x % 2 == y % 2) {
-							hexGrid[y].push(1);
+							hexGrid[y].push([1, true]);
 						}else {
-							hexGrid[y].push(false);
+							hexGrid[y].push([false, false]);
 						}
 					}
 				}
@@ -155,9 +155,9 @@
 				hexGrid.push([]);
 				for(var x = 0; x < w; x ++) {
 					if(x % 2 == y % 2) {
-						hexGrid[y].push(1);
+						hexGrid[y].push([1, true]);
 					}else {
-						hexGrid[y].push(false);
+						hexGrid[y].push([false, false]);
 					}
 				}
 			}
@@ -217,13 +217,43 @@
 			}
 
 			function placeHex(row, col) {
-				colorHex(col * hexWidth * 0.75 + hexWidth/2, row * hexHeight/2 + hexHeight/2, hexGrid[row][col]);
+				colorHex(col * hexWidth * 0.75 + hexWidth/2, row * hexHeight/2 + hexHeight/2, hexGrid[row][col][0]);
+			}
+			
+			function markChunk(centerRow, centerCol) {
+				hexGrid[centerRow][centerCol][1] = true;
+				if(centerRow > 0) {
+					if(centerCol > 0) {
+						hexGrid[centerRow - 1][centerCol - 1][1] = true;
+					}
+					if(centerCol + 1 < hexGrid[centerRow - 1].length) {
+						hexGrid[centerRow - 1][centerCol + 1][1] = true;
+					}
+					if(centerRow - 2 >= 0) {
+						hexGrid[centerRow - 2][centerCol][1] = true;
+					}
+				}
+				if(centerRow + 1 < hexGrid.length) {
+					if(centerCol > 0) {
+						hexGrid[centerRow + 1][centerCol - 1][1] = true;
+					}
+					if(centerCol + 1 < hexGrid[centerRow + 1].length) {
+						hexGrid[centerRow + 1][centerCol + 1][1] = true;
+					}
+					if(centerRow + 2 < hexGrid.length) {
+						hexGrid[centerRow + 2][centerCol][1] = true;
+					}
+				}
 			}
 
 			function nextStep() {
 				var prevGrid = [];
-				for(var i = 0; i < hexGrid.length; i ++) {
-					prevGrid.push(hexGrid[i].slice());
+				for(var y = 0; y < hexGrid.length; y ++) {
+					prevGrid.push([]);
+					for(var x = 0; x < hexGrid[y].length; x ++) {
+						prevGrid[y].push([hexGrid[y][x][0], hexGrid[y][x][1]]);
+						hexGrid[y][x][1] = false;
+					}
 				}
 				for(var type = 0; type < 3; type ++) {
 					for(var num = 0; num < 8; num ++) {
@@ -232,40 +262,43 @@
 				}
 				for(var row = 0; row < prevGrid.length; row ++) {
 					for(var col = 0; col < prevGrid[row].length; col ++) {
-						if(prevGrid[row][col]) {
+						if(prevGrid[row][col][0] && prevGrid[row][col][1]) {
 							var aN = 0;//alive neighbors
 							if(row > 0) {
 								if(col > 0) {
-									aN += prevGrid[row - 1][col - 1] - 1;
+									aN += prevGrid[row - 1][col - 1][0] - 1;
 								}
 								if(col + 1 < prevGrid[row - 1].length) {
-									aN += prevGrid[row - 1][col + 1] - 1;
+									aN += prevGrid[row - 1][col + 1][0] - 1;
 
 								}
 								if(row - 2 >= 0) {
-									aN += prevGrid[row - 2][col] - 1;
+									aN += prevGrid[row - 2][col][0] - 1;
 								}
 							}
 							if(row + 1 < prevGrid.length) {
 								if(col > 0) {
-									aN += prevGrid[row + 1][col - 1] - 1;
+									aN += prevGrid[row + 1][col - 1][0] - 1;
 								}
 								if(col + 1 < prevGrid[row + 1].length) {
-									aN += prevGrid[row + 1][col + 1] - 1;
+									aN += prevGrid[row + 1][col + 1][0] - 1;
 								}
 								if(row + 2 < prevGrid.length) {
-									aN += prevGrid[row + 2][col] - 1;
+									aN += prevGrid[row + 2][col][0] - 1;
 								}
 							}
-							switch(ruleEval(prevGrid[row][col], aN)) {
+							switch(ruleEval(prevGrid[row][col][0], aN)) {
 								case "die":
-									hexGrid[row][col] = 1;
+									hexGrid[row][col][0] = 1;
+									markChunk(row, col);
 								break;
 								case "revive":
-									hexGrid[row][col] = 2;
+									hexGrid[row][col][0] = 2;
+									markChunk(row, col);
 								break;
 								case "ascend":
-									hexGrid[row][col] ++;
+									hexGrid[row][col][0] ++;
+									markChunk(row, col);
 								default:
 							}
 							if(!fullUpdate) {
@@ -300,7 +333,7 @@
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
-						if(hexGrid[row][col]) {
+						if(hexGrid[row][col][0]) {
 							placeHex(row, col);
 						}
 					}
@@ -312,8 +345,8 @@
 				turnCounter.innerHTML = turn;
 				for(var row = 0; row < hexGrid.length; row ++) {
 					for(var col = 0; col < hexGrid[row].length; col ++) {
-						if(hexGrid[row][col]) {
-							hexGrid[row][col] = 1;
+						if(hexGrid[row][col][0]) {
+							hexGrid[row][col] = [1, true];
 						}
 					}
 				}
@@ -324,11 +357,12 @@
 				for(var i = 0; i < randomAddIntesity.value; i ++) {
 					var row = Math.floor(Math.random() * h);
 					var col = Math.floor(Math.random() * w);
-					while(!hexGrid[row][col]) {
+					while(!hexGrid[row][col][0]) {
 						row = Math.floor(Math.random() * h);
 						col = Math.floor(Math.random() * w);
 					}
-					hexGrid[row][col] = 2;
+					hexGrid[row][col][0] = 2;
+					markChunk(row, col);
 				}
 				updateCanvas();
 			}
@@ -341,7 +375,7 @@
 				var trueCol = colAprox;
 				var trueRow = rowAprox;
 				console.log(".\nrowAprox: " + rowAprox + "\ncolAprox: " + colAprox + "\n.");
-				if(hexGrid[rowAprox][colAprox]) {
+				if(hexGrid[rowAprox][colAprox][0]) {
 					if(checkY < -Math.sqrt(3)*checkX + hexSide) {
 						console.log(checkY + " < " + (-Math.sqrt(3)*checkX + hexSide));
 						trueRow --;
@@ -349,7 +383,7 @@
 					}else {
 						console.log(checkY + " >= " + (-Math.sqrt(3)*checkX + hexSide));
 					}
-				}else if(hexGrid[rowAprox - 1][colAprox]){
+				}else if(hexGrid[rowAprox - 1][colAprox][0]){
 					rowAprox --;
 					trueRow = rowAprox;
 					checkY = y - rowAprox * yPosRef;
@@ -363,13 +397,14 @@
 				if(lastClicked.row != trueRow || lastClicked.col != trueCol) {
 					lastClicked.row = trueRow;
 					lastClicked.col = trueCol;
-					if(hexGrid[trueRow][trueCol]) {
-						if(hexGrid[trueRow][trueCol] == 1) {
-							hexGrid[trueRow][trueCol] = 2;
+					if(hexGrid[trueRow][trueCol][0]) {
+						if(hexGrid[trueRow][trueCol][0] == 1) {
+							hexGrid[trueRow][trueCol][0] = 2;
 						}else {
-							hexGrid[trueRow][trueCol] = 1;
+							hexGrid[trueRow][trueCol][0] = 1;
 						}
 						placeHex(trueRow, trueCol);
+						markChunk(trueRow, trueCol);
 					}
 				}
 			}

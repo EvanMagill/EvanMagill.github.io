@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Connect N</title>
+		<style id="styleTag"></style>
+		<script>
+			var rows;
+			var columns;
+			var player = {
+				red: "",
+				yellow: ""
+			};
+			var yellowPlayer;
+			var connectN = 4;
+			var activePlayer = "red";
+			var fallStart = null;
+			var board;
+			var boardArray = [];
+			var activePiece;
+			var piecePosition = [];
+			var subTotals = {
+				red: [
+						[0, 0, 0],
+						[0, 0, 0],
+						[0, 0, 0]
+					],
+				yellow: [
+						[0, 0, 0],
+						[0, 0, 0],
+						[0, 0, 0]
+					]
+			};
+			var totals = {
+				red: [0, 0, 0, 0],
+				yellow: [0, 0, 0, 0]
+			};
+			function setValues() {
+				rows = document.getElementById("rows").value;
+				columns = document.getElementById("columns").value;
+				player.red = document.getElementById("redPlayer").value;
+				player.yellow = document.getElementById("yellowPlayer").value;
+				connectN = document.getElementById("connect").value;
+			}
+			function generateBoard() {
+				if(document.getElementById("board")){//Deletes any already generated boards.
+					document.getElementById("board").remove();
+					document.getElementById("activePiece").remove();
+					boardArray = [];
+				}
+				board = document.createElement("table");
+				board.id = "board"
+				var topRow = document.createElement("tr");
+				board.appendChild(topRow);
+				for(var columnTops = 0; columnTops < columns; columnTops ++) {
+					var placeHolder = document.createElement("td");
+					topRow.appendChild(placeHolder);
+					var placeHolderImage = document.createElement("img");
+					placeHolderImage.src = "placeHolder.png";
+					placeHolderImage.id = columnTops;
+					placeHolderImage.class = "placeHolder";
+					placeHolder.appendChild(placeHolderImage);
+				}
+				activePiece = document.createElement("img");
+				activePiece.src = "placeHolder.png";
+				activePiece.id = "activePiece";
+				activePiece.style = "position: absolute; z-index: -1;";
+				document.getElementById("body").appendChild(activePiece);
+				for(var r = 0; r < rows; r ++) {
+					var row = document.createElement("tr");
+					board.appendChild(row);
+					boardArray.push([]);
+					for(var c = 0; c < columns; c ++) {//Ha "C++"
+						var column = document.createElement("td");
+						row.appendChild(column);
+						var slot = document.createElement("img");
+						slot.src = "empty.png";
+						slot.id = r + "," + c;
+						slot.class = "empty";
+						slot.setAttribute("onclick", "turn(this.id);");
+						column.appendChild(slot);
+						boardArray[r].push(slot);
+					}
+				}
+				document.getElementById("body").appendChild(board);
+				styleTag = document.getElementById("styleTag");
+				styleTag.innerHTML = "table, tr, td, img {padding: 0;   margin: 0;   border: none;   border-collapse: collapse;   line-height: 0;}";
+				activePlayer = "red";
+				activePiece = document.getElementById("activePiece");
+				activePiece.style.left = document.getElementById("1").getBoundingClientRect().left;
+				activePiece.style.top = document.getElementById("1").getBoundingClientRect().top;
+			}
+			function begin() {
+				document.getElementById("playButton").innerHTML = "Reset";
+				setValues();
+				generateBoard();
+				if(player.red == "computer") {
+					computerTurn();
+				}
+			}
+			function turnEval(row, col, cpu) {
+				subTotals = {
+					red: [
+							[0, 0, 0],
+							[0, 0, 0],
+							[0, 0, 0]
+						],
+					yellow: [
+							[0, 0, 0],
+							[0, 0, 0],
+							[0, 0, 0]
+						]
+				};
+				cpu = cpu || false;
+				var color = activePlayer;
+				var loop = 1;
+				if(cpu) {
+					color = "red";
+					loop = 2;
+				}
+				for(var eval = 0; eval < loop; eval ++) {
+					for(var r = -1; r < 2; r ++) {
+						for(var c = -1; c < 2; c ++) {
+							if((r || c) && boardArray[row + r] && boardArray[row + r][col + c]) {
+								var depth = 1;
+								var broken = false;
+								while(!broken && boardArray[row + r * depth][col + c * depth].class == color) {
+									subTotals[color][r + 1][c + 1] ++;
+									depth ++;
+									if(!boardArray[row + r * depth] || !boardArray[row + r * depth][col + c * depth] || boardArray[row + r * depth][col + c * depth].class != color) {
+										broken = true;
+									}
+								}
+							}
+						}
+					}
+					totals[color][0] = subTotals[color][0][0] + subTotals[color][2][2];
+					totals[color][1] = subTotals[color][0][1] + subTotals[color][2][1];
+					totals[color][2] = subTotals[color][0][2] + subTotals[color][2][0];
+					totals[color][3] = subTotals[color][1][2] + subTotals[color][1][0];
+					if(!cpu && (totals[color][0] > connectN - 2 || totals[color][1] > connectN - 2 || totals[color][2] > connectN - 2 || totals[color][3] > connectN - 2)) {
+						return true;
+					}
+					color = "yellow";
+				}
+			}
+			function win() {
+				alert(activePlayer.charAt(0).toUpperCase() + activePlayer.slice(1) + " wins!");
+			}
+			function animationEnd() {
+				activePiece.src = "placeHolder.png";
+				boardArray[piecePosition[0]][piecePosition[1]].src = activePlayer + ".png";
+				boardArray[piecePosition[0]][piecePosition[1]].class = activePlayer;
+				if(turnEval(piecePosition[0], piecePosition[1])) {
+					win();
+				}
+				if(activePlayer == "red") {
+					activePlayer = "yellow";
+				}else {
+					activePlayer = "red";
+				}
+				fallStart = null;
+				if(player[activePlayer] == "computer") {
+					computerTurn();
+				}
+			}
+			function fall(timestamp) {
+				if(!fallStart) {
+					fallStart = timestamp;
+					activePiece.src = activePlayer + "Piece.png";
+					activePiece.style.left = document.getElementById(piecePosition[1]).getBoundingClientRect().left + "px";
+				}
+				var t = timestamp - fallStart;
+				activePiece.style.top = parseInt(document.getElementById(piecePosition[1]).getBoundingClientRect().top) + 0.01 * t * t + "px";
+				if(parseInt(activePiece.getBoundingClientRect().top) <  parseInt(boardArray[piecePosition[0]][piecePosition[1]].getBoundingClientRect().top)) {
+					window.requestAnimationFrame(fall);
+				}else {
+					animationEnd();
+				}
+			}
+			function drop(row, col) {
+				piecePosition = [row, col];
+				fallStart = null;
+				window.requestAnimationFrame(fall);
+			}
+			function positionCheck(col) {
+				for(var check = rows - 1; check > -1; check --) {
+					if(boardArray[check][col].class == "empty") {
+						return check;
+					}
+				}
+				return -1;
+			}
+			function place(col) {
+				var row = positionCheck(col);
+				if(row + 1) {
+					drop(row, col, activePlayer);
+				}else {
+					console.log("Invalid play");
+				}
+			}
+			function turn(slotID) {//As in play/move not rotation.
+				if(!fallStart) {
+					var commaPassed = false;
+					var column = "";
+					for(var i = 0; i < slotID.length; i ++) {
+						if(commaPassed) {
+							column += slotID[i];
+						}else {
+							if(slotID[i] == ",") {
+								commaPassed = true;
+							}
+						}
+					}
+					column = parseInt(column);
+					place(column);
+				}else {
+					console.log("Please wait for all pieces to fall.");
+				}
+			}
+			function computerTurn() {
+				var turnValues = [];
+				for(var col = 0; col < columns; col ++) {
+					if(positionCheck(col) + 1) {
+						turnEval(positionCheck(col), col, "cpu");
+						tempVal = 0;
+						for(var i = 0; i < 4; i ++) {
+							tempVal += Math.pow(10, totals[activePlayer][i]);
+							if(totals[activePlayer][i] > connectN - 1) {tempVal += 6.02 * Math.pow(10, 23);}//For my chem teacher.
+							var inactivePlayer = "red";
+							if(activePlayer == "red") { inactivePlayer = "yellow"; }
+							tempVal += Math.pow(10, totals[inactivePlayer][i]);
+						}
+						tempVal -= Math.abs(columns/2 - col)/(columns/2);
+						turnValues.push(tempVal);
+					}else {
+						turnValues.push(0);
+					}
+				}
+				var highestValue = 0;
+				var bestColumn = 0;
+				for(var numCheck = 0; numCheck < turnValues.length; numCheck ++) {
+					if(highestValue < turnValues[numCheck]) {
+						highestValue = turnValues[numCheck];
+						bestColumn = numCheck;
+					}
+				}
+				place(bestColumn);
+			}
+		</script>
+	</head>
+	<body id="body">
+		Board Dimensions (rows X columns): <input type="text" id="rows" value="6"/> X <input type="text" id="columns" value="7"/>
+		<br/>
+		Connect <input type="text" id="connect" value="4"/>
+		<br/>
+		Players (Red goes first)
+		<br/>
+		Red: <select id="redPlayer">
+			<option value="player">Player</option>
+			<option value="computer">Computer</option>
+		</select> Yellow: <select id="yellowPlayer">
+			<option value="player">Player</option>
+			<option value="computer">Computer</option>
+		</select>
+		<br/>
+		<button id="playButton" type="button" onClick="begin();">Play</button>
+	</body>
+</html>
